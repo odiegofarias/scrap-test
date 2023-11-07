@@ -15,43 +15,31 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
 }
 
-categorias = ['hibrido', 'shoppings', 'recebiveis-imobiliarios', 'galpoes-logisticos']
-# , 'shoppings', 'recebiveis-imobiliarios', 'galpoes-logisticos'
-
-fundos_imob = dict()
-
-for consulta in range(len(categorias)):
-    categoria = categorias[consulta]
-
-    r_get_fundos_por_categoria = requests.get(f'https://mundofii.com/categorias/{categoria}', headers=headers)
-
-    sel = Selector(text=r_get_fundos_por_categoria.text)
-    fiis = sel.xpath("//span[@class='fii_siglaCompleta tCor2 claro']/text()").getall()
-
-    fundos_imob[categoria] = fiis
-
 dic = dict()
 
-for chave, valor in fundos_imob.items():
-    for ticker in valor:
-        
-        r = requests.post('https://www.clubefii.com.br/pega_cotacao', headers=headers, data={'cod_neg': ticker})
+fundos_imobiliarios = ['ALZR11', 'KNRI11', 'HGLG11', 'HGCR11', 'BTLG11', 'BRCO11', 'HGRU11' ,'HGBS11' ,'TRXF11', 'AFHI11', 'HSML11', 'BTAL11', 'TGAR11', 'KNSC11', 'VGHF11', 'CPTS11', 'PATL11']
 
-        """
-            - Pegar cotação no mundofii
-            # sel = Selector(text=r.text)
-            # cotacao_atual = sel.xpath("//span[@class='flash_card--a card noWrap noMargin noPadding 100% th4']/b/text()").get().strip()
-        """
-        data_json = r.text.split(';')[0][:6]
-        cotacao_atual = data_json
-        dic[ticker] = cotacao_atual
+# for chave, valor in fundos_imob.items():
+for ativo in fundos_imobiliarios:
+    
+    r = requests.post('https://www.clubefii.com.br/pega_cotacao', headers=headers, data={'cod_neg': ativo})
 
-        print(f'Buscando por: {ticker}')
+    """
+        - Pegar cotação no mundofii
+        # sel = Selector(text=r.text)
+        # cotacao_atual = sel.xpath("//span[@class='flash_card--a card noWrap noMargin noPadding 100% th4']/b/text()").get().strip()
+    """
+    data_json = r.text.split(';')[0][:6]
+    cotacao_atual = data_json
+    dic[ativo] = cotacao_atual
 
-        sleep(0.5)
-        
+    print(f'Buscando por: {ativo}')
+
+    sleep(0.5)
+    
 with open(f'arquivo.json', 'w') as f:
     json.dump(dic, f, indent=4)
+    f.write(agora)
 
 
 
